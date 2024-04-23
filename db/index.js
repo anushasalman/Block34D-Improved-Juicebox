@@ -1,3 +1,5 @@
+const { PrismaClient, Prisma } = require('@prisma/client');
+const prisma = new PrismaClient()
 
 const { Client } = require('pg');
 
@@ -20,16 +22,12 @@ return user;
 
 const createUser = async (username, password) => {
   try{
-  const {
-    rows: [user],
-  } = await client.query(
-    `
-    INSERT INTO users(username, password)
-    VALUES ($1, $2)
-    RETURNING *;
-    `,
-    [username, password]
-  );
+  const user = await prisma.users.create({
+    data: {
+      username,
+      password
+    }
+  })
 
   return user;
   } catch(err) {
@@ -37,17 +35,17 @@ const createUser = async (username, password) => {
 }
 };
 
-const createPost = async ({ title, content, addedBy }) => {
+const createPost = async ({ title, content, ownerId }) => {
   try{
   const { 
     rows: [post],
   } = await client.query(
     `
-  INSERT INTO posts(title, content, addedBy)
+  INSERT INTO posts(title, content, ownerId)
   VALUES ($1, $2, $3)
   RETURNING *;
   `,
-[title, content, addedBy]
+[title, content, ownerId]
 );
 
 return post;
@@ -89,7 +87,7 @@ const deletePost = async (postId) => {
 const getAllUsersPosts = async (userId) => {
   try{
     const {rows} = await client.query(`
-    SELECT * FROM posts WHERE addedBy=${userId};
+    SELECT * FROM posts WHERE ownerId=${userId};
     `);
 
     return rows;

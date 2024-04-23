@@ -37,7 +37,7 @@ postsRouter.post("/", requireUser, async (req, res) => {
     const newlyCreatedPost = await createPost({
       title,
       content,
-      addedBy: req.user.id
+      ownerId: req.user.id
     });
 
     res.send(newlyCreatedPost);
