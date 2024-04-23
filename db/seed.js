@@ -1,4 +1,4 @@
-const { create } = require("domain");
+require('dotenv').config()
 const { client } = require("./index");
 
 // Create a posts table
