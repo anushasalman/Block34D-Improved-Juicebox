@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const usersRouter = express.Router();
 const jwt = require("jsonwebtoken");
-const { client, createUser } = require('../db');
+const { client, createUser, getUserById, getUserByUsername } = require('../db');
 
 const signToken = (username, id) => {
   const token = jwt.sign({ id, username }, process.env.JWT_SECRET, {
@@ -20,13 +20,8 @@ usersRouter.post('/login', async (req, res) => {
   const plainTextPassword = req.body.password;
 
   try {
-    const { rows: [user] } = await client.query(
-      `
-SELECT * FROM users
-WHERE username = $1
-`,
-      [username]
-    );
+      const user = await getUserByUsername();
+    
   
     if (!user) {
       res.sendStatus(401);
@@ -64,7 +59,7 @@ usersRouter.post("/register", async (req, res) => {
     const user = createUser(username, hashedPassword);
 
 
-    const token = signToken(user.username, user.id);
+    const token = signToken(user.id, user.username);
 
 
     res.send({ message: "Successful Registration", token });

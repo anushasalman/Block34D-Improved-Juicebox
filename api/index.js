@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const {getUserById} = require('../db');
+// const {getUserById} = require('../db');
 const apiRouter = express.Router();
 
 
@@ -18,20 +18,22 @@ const token = auth.slice(prefix.length);
 
 
 const {id} = jwt.verify(token, process.env.JWT_SECRET);
+  }
+});
 
-if(id){
-// set the "user" on request to be the user
-const user = await getUserById(id);
-req.user = {id: user.id, username: user.username};
-next();
-} else{
-  next();
-}
-  }
-  else {
-    next();
-  }
-})
+// if(id){
+
+// const user = await getUserById(id);
+// req.user = {id: user.id, username: user.username};
+// next();
+// } else{
+//   next();
+// }
+//   }
+//   else {
+//     next();
+//   }
+// })
 
 
 apiRouter.get("/", (req, res) => {

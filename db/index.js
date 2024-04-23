@@ -7,19 +7,34 @@ const client = new Client(
   process.env.DATABASE_URL || "postgres://localhost:5432/34d_juicebox"
 );
 
-const getUserById = async (id) => {
-  try {
-    const { rows: [user] } = await client.query(`
-  SELECT * FROM users
-  WHERE id=$1;
-`, [id])
-    return user;
-  }
-  catch (err) {
-    throw err;
-  }
-}
+// const getUserById = async (id) => {
+//   try {
+//     const user = await prisma.users.findUnique({
+//       where:{
+//         id
+//       }
+//     });
 
+//     return user;
+//   }
+//   catch (err) {
+//     throw err;
+//   }
+// }
+
+
+const getUserByUsername = async (username) => {
+  try{ 
+const user = await prisma.users.findUnique({
+  where:{
+    username
+  }
+});
+return user;
+  }catch(err){
+    throw err;
+}
+}
 const createUser = async (username, password) => {
   try {
     const user = await prisma.users.create({
@@ -48,35 +63,31 @@ const createPost = async ({ title, content, ownerId }) => {
 } catch(err) {
   throw err;
 }
-};
+}
 
 const getAllPosts = async () => {
   try{
-    const {rows} = await client.query(`
-  SELECT * FROM posts;
-  `);
+    const rows = await prisma.posts.findMany();
 
     return rows;
-  } 
-  catch(err) {
+  } catch(err) {
     throw err;
   }
 };
 
 const deletePost = async (postId) => {
   try{
-    const {rows: [post]} = await client.query(
-      `
-    DELETE FROM posts
-    WHERE id = ${ postId }
-  RETURNING *;
-  `
-  )
+    const post = await prisma.post.delete({
+      where: {
+        id: parseInt(postId),
+      },
+    });
+      
   return post;
   } catch(err) {
     throw err;
   }
-}
+};
 
 
 
@@ -101,7 +112,8 @@ module.exports = {
   createUser,
   createPost,
   getAllPosts,
-  getUserById,
+  // getUserById,
   getAllUsersPosts,
-  deletePost
+  deletePost,
+  getUserByUsername
 }
